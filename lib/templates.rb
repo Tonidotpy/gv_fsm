@@ -31,14 +31,30 @@ module GV_FSM
       <% end %>
       #include <stdbool.h>
 
+      <% user_begin = "USER CODE BEGIN" %>
+      <% user_end = "USER CODE END" %>
+      <% user_tag = "GLOBALS" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
+
       // State data object
       // By default set to void; override this typedef or load the proper
       // header if you need
-      typedef void <%= @prefix %>state_data_t;
+      /*** USER STATE DATA TYPE BEGIN ***/
+      typedef <%= @user_state_data_type %> <%= @prefix %>state_data_t;
+      /*** USER STATE DATA TYPE END ***/
       // Event data object
       // By default the struct is empty; put the data of the event inside
       // the structure if you need or leave it empty
-      typedef struct { } <%= @prefix %>event_data_t;
+      typedef struct {
+        <% user_tag = 'EVENT_DATA' %>
+        /*** <%= user_begin %> <%= user_tag %> ***/
+        <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+        /*** <%= user_end %> <%= user_tag %> ***/
+
+      } <%= @prefix %>event_data_t;
       <% if !@ino then %>
       
       // NOTHING SHALL BE CHANGED AFTER THIS LINE!
@@ -119,6 +135,14 @@ module GV_FSM
       <% end %>
       #include "<%= File::basename(@cname) %>.h"
 
+      <% user_begin = "USER CODE BEGIN" %>
+      <% user_end = "USER CODE END" %>
+      <% user_tag = "GLOBALS" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
+
       <% if sigint then %>// Install signal handler: 
       // SIGINT requests a transition to state <%= self.sigint %>
       #include <signal.h>
@@ -132,8 +156,6 @@ module GV_FSM
       }
 
       <% end %>
-      <% placeholder = "Your Code Here" %>
-      // SEARCH FOR <%= placeholder %> FOR CODE INSERTION POINTS!
 
       // GLOBALS
       // State human-readable names
@@ -212,7 +234,10 @@ module GV_FSM
       <% elsif log == :ino then %>
         Serial.println("[FSM] In state <%= s[:id] %>");
       <% end %>
-        /* <%= placeholder %> */
+        <% user_tag = s[:function].delete_prefix(prefix).upcase %>
+        /*** <%= user_begin %> <%= user_tag %> ***/
+        <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
+        /*** <%= user_end %> <%= user_tag %> ***/
         
         switch (next_state) {
       <% dest[s[:id]].each  do |str| %>
@@ -265,7 +290,10 @@ module GV_FSM
       <% elsif log == :ino then %>
         Serial.println("[FSM] State transition <%= t %>");
       <% end %>
-        /* <%= placeholder %> */
+        <% user_tag = t.delete_prefix(prefix).upcase %>
+        /*** <%= user_begin %> <%= user_tag %> ***/
+        <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
+        /*** <%= user_end %> <%= user_tag %> ***/
       }
 
       <% end %>

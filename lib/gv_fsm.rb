@@ -22,6 +22,11 @@ module GV_FSM
       @nodemap = {}
       @sigint = nil
       parse(filename) if filename
+
+      # User code sections
+      @user_c_code = {}
+      @user_h_code = {}
+      @user_state_data_type = "void"
     end
 
     def prefix=(v)
@@ -141,20 +146,55 @@ module GV_FSM
     end
 
     def generate_c(filename = @cname)
-      ext = @ino ? "cpp" : "c"
+      ext = @ino ? 'cpp' : 'c'
       fname = "#{filename}.#{ext}"
-      File.open(fname, "w") do |f|
-        f.puts ERB.new(HEADER, 0, "<>").result(binding)
-        f.puts ERB.new(CC, 0, "<>").result(binding)
+      
+      # Read user code to keep inside the file if exists
+      if File.file?(fname)
+        old_f = File.read(fname)
+        
+        # Regex to match a single user code block
+        user_block = /\/\*\*\*\s*USER\s+CODE\s+BEGIN\s+(\w+)\s*\*\*\*\/[\t ]*[\r\n\v\f]?(.*?)[\t ]*\/\*\*\*\s*USER\s+CODE\s+END\s+\1\s*\*\*\*\//ms
+        old_f.scan(user_block).each {
+          |match|
+          user_tag, code = match
+          @user_c_code[user_tag] = code
+        }
+      end
+
+      File.open(fname, 'w') do |f|
+        f.puts ERB.new(HEADER, trim_mode: "<>").result(binding)
+        f.puts ERB.new(CC, trim_mode: "<>").result(binding)
       end
       return fname
     end
 
     def generate_h(filename = @cname)
       fname = "#{filename}.h"
+
+      # Read user code to keep inside the file if exists
+      if File.file?(fname)
+        old_f = File.read(fname)
+        
+        # Get user defined type of state_data_t
+        state_data = /\/\*\*\*\s*USER\s+STATE\s+DATA\s+TYPE\s+BEGIN\s*\*\*\*\/.*?^typedef\s*(.*?)\s*\w*state_data_t.*?\/\*\*\*\s*USER\s+STATE\s+DATA\s+TYPE\s+END\s*\*\*\*\//sm
+        match = state_data.match(old_f)
+        if !match.nil? and !match.captures.nil?
+          @user_state_data_type = match.captures.first
+        end
+
+        # Regex to match a single user code block
+        user_block = /\/\*\*\*\s*USER\s+CODE\s+BEGIN\s+(\w+)\s*\*\*\*\/[\t ]*[\r\n\v\f]?(.*?)[\t ]*\/\*\*\*\s*USER\s+CODE\s+END\s+\1\s*\*\*\*\//ms
+        old_f.scan(user_block).each {
+          |match|
+          user_tag, code = match
+          @user_h_code[user_tag] = code
+        }
+      end
+
       File.open(fname, "w") do |f|
-        f.puts ERB.new(HEADER, 0, "<>").result(binding)
-        f.puts ERB.new(HH, 0, "<>").result(binding)
+        f.puts ERB.new(HEADER, trim_mode: "<>").result(binding)
+        f.puts ERB.new(HH, trim_mode: "<>").result(binding)
       end
       return fname
     end
