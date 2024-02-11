@@ -38,6 +38,26 @@ The main interface to the FSM in C is the `run_state` function. See at the end o
 
 If you need an FSM for your Arduino, you can generate it with the command option `--ino`: this will generate a `.h` and a `.cpp` files, omitting all instructions that are not available on the Arduino (e.g. the `syslog` calls, which are replaced with `Serial.print calls`). Load these files in the IDE, require the header from the main `.ino` file, and call the FSM manager function from within the main `loop()` function.
 
+## NEW in version 0.5
+
+GV_FSM version 0.5.0 introduces a new functionality that makes the user able to keep the previously written code after regenerating the file.
+
+Inside the generated source and header files one or more sections can be found, delimited by special comments, in the form of:
+```c
+/*** USER CODE BEGIN [section name] ***/
+/*** USER CODE END [section name] ***/
+```
+where the name depends on the current section (for example the global section, where includes, macros and global variables can be added has the name `GLOBAL`).
+
+> [!IMPORTANT]
+> Those comments should not be modified for wathever reason, otherwise the code generation mechanism might not be able to work correctly
+
+In the older versions of the GV_FSM if you wanted to modify an existing project it was needed to rename the files, regenerate them and copy back all the code inside the new files. \
+Now the same thing can be done **in place** just by running the gv_fsm executable on the same file where the code was written.
+
+Keep in mind that this will only work if the files have the same name and all the code written by the user is inside the previously described sections, \
+**all the code outside of those sections will be deleted**.
+
 ## NEW in version 0.4
 
 GV_FSM version 0.4.0 introduces a new mechanism to trigger state changes from outside the FSM using events.
