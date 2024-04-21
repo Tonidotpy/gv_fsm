@@ -23,8 +23,8 @@ module GV_FSM
 
     HH =<<~EOH
       <% if !@ino then %>
-      #ifndef <%= File::basename(@cname).upcase %>_H
-      #define <%= File::basename(@cname).upcase %>_H
+      #ifndef <%= File::basename(@cname).upcase.gsub(/-/, '_') %>_H
+      #define <%= File::basename(@cname).upcase.gsub(/-/, '_') %>_H
       #include <stdlib.h>
       <% else %>
       #include <arduino.h>
