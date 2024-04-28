@@ -31,9 +31,7 @@ module GV_FSM
       <% end %>
       #include <stdbool.h>
 
-      <% user_begin = "USER CODE BEGIN" %>
-      <% user_end = "USER CODE END" %>
-      <% user_tag = "GLOBALS" %>
+      <% user_begin = "USER CODE BEGIN"; user_end = "USER CODE END"; user_tag = "MACROS" %>
       /*** <%= user_begin %> <%= user_tag %> ***/
       <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
 
@@ -81,6 +79,12 @@ module GV_FSM
       typedef <%= @prefix %>state_t state_func_t(<%= @prefix %>state_data_t *data);
       <% end %>
 
+      <% user_tag = "TYPES" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
+
       // Functions to check and trigger an event
       bool <%= @prefix %>is_event_triggered();
       void <%= @prefix %>event_trigger(<%= @prefix %>event_data_t *event);
@@ -118,6 +122,12 @@ module GV_FSM
 
       // state manager
       <%= @prefix %>state_t <%= @prefix %>run_state(<%= @prefix %>state_t cur_state, <%= @prefix %>state_data_t *data);
+
+      <% user_tag = "FUNCTIONS" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
       
       <% if !@ino then %>
       #endif
@@ -135,9 +145,7 @@ module GV_FSM
       <% end %>
       #include "<%= File::basename(@cname) %>.h"
 
-      <% user_begin = "USER CODE BEGIN" %>
-      <% user_end = "USER CODE END" %>
-      <% user_tag = "GLOBALS" %>
+      <% user_begin = "USER CODE BEGIN"; user_end = "USER CODE END"; user_tag = "MACROS" %>
       /*** <%= user_begin %> <%= user_tag %> ***/
       <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
 
@@ -186,6 +194,13 @@ module GV_FSM
 
       // Triggered event
       <%= @prefix %>event_data_t * <%= prefix %>fired_event = NULL;
+
+      <% user_tag = "GLOBALS" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
+
 
       // Function to check if an event has fired
       inline bool <%= @prefix %>is_event_triggered() {
@@ -314,6 +329,11 @@ module GV_FSM
        */
 
       <%= @prefix %>state_t <%= @prefix %>run_state(<%= @prefix %>state_t cur_state, <%= @prefix %>state_data_t *data) {
+        <% user_tag = "RUN_STATE" %>
+        /*** <%= user_begin %> <%= user_tag %> ***/
+        <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+        /*** <%= user_end %> <%= user_tag %> ***/
+
         <%= @prefix %>event_data_t *prev_ev = <%= @prefix %>fired_event;
         <%= @prefix %>state_t new_state = <%= @prefix %>state_table[cur_state](data);
         // Reset event status
@@ -327,6 +347,12 @@ module GV_FSM
       <% end %>
         return new_state;
       };
+
+      <% user_tag = "FUNCTIONS" %>
+      /*** <%= user_begin %> <%= user_tag %> ***/
+      <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+
+      /*** <%= user_end %> <%= user_tag %> ***/
 
       <% if @ino then %>
       /* Example usage:
