@@ -331,7 +331,7 @@ module GV_FSM
       <%= @prefix %>state_t <%= @prefix %>run_state(<%= @prefix %>state_t cur_state, <%= @prefix %>state_data_t *data) {
         <% user_tag = "RUN_STATE" %>
         /*** <%= user_begin %> <%= user_tag %> ***/
-        <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+        <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
         /*** <%= user_end %> <%= user_tag %> ***/
 
         <%= @prefix %>event_data_t *prev_ev = <%= @prefix %>fired_event;
@@ -350,7 +350,7 @@ module GV_FSM
 
       <% user_tag = "FUNCTIONS" %>
       /*** <%= user_begin %> <%= user_tag %> ***/
-      <%= @user_h_code[user_tag].nil? ? '' : @user_h_code[user_tag].strip %>
+      <%= @user_c_code[user_tag].nil? ? '' : @user_c_code[user_tag].strip %>
 
       /*** <%= user_end %> <%= user_tag %> ***/
 
