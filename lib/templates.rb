@@ -203,12 +203,12 @@ module GV_FSM
 
 
       // Function to check if an event has fired
-      inline bool <%= @prefix %>is_event_triggered() {
+      bool <%= @prefix %>is_event_triggered() {
           return <%= prefix %>fired_event != NULL;
       }
 
       // Function to trigger an event
-      inline void <%= @prefix %>event_trigger(<%= @prefix %>event_data_t *event) {
+      void <%= @prefix %>event_trigger(<%= @prefix %>event_data_t *event) {
           if (<%= @prefix %>fired_event != NULL)
               return;
           <%= @prefix %>fired_event = event ? event : &(<%= @prefix %>event_data_t){};
