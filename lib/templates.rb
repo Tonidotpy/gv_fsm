@@ -72,11 +72,11 @@ module GV_FSM
       
       <% if transition_functions_list.count > 0 then %>
       // State function and state transition prototypes
-      typedef <%= @prefix %>state_t state_func_t(<%= @prefix %>state_data_t *data);
+      typedef <%= @prefix %>state_t <%= @prefix %>state_func_t(<%= @prefix %>state_data_t *data);
       typedef void transition_func_t(<%= @prefix %>state_data_t *data);
       <% else %>
       // State function prototype
-      typedef <%= @prefix %>state_t state_func_t(<%= @prefix %>state_data_t *data);
+      typedef <%= @prefix %>state_t <%= @prefix %>state_func_t(<%= @prefix %>state_data_t *data);
       <% end %>
 
       <% user_tag = "TYPES" %>
@@ -104,7 +104,7 @@ module GV_FSM
 
 
       // List of state functions
-      extern state_func_t *const <%= @prefix %>state_table[<%= @prefix.upcase %>NUM_STATES];
+      extern <%= @prefix %>state_func_t *const <%= @prefix %>state_table[<%= @prefix.upcase %>NUM_STATES];
       
 
       <% if transition_functions_list.count > 0 then %>
@@ -171,7 +171,7 @@ module GV_FSM
 
       // List of state functions
       <% fw = state_functions_list.max {|a, b| a.length <=> b.length}.length %>
-      state_func_t *const <%= @prefix %>state_table[<%= @prefix.upcase %>NUM_STATES] = {
+      <%= @prefix %>state_func_t *const <%= @prefix %>state_table[<%= @prefix.upcase %>NUM_STATES] = {
       <% @states.each do |s| %>
         <%= (s[:function] + ',').ljust(fw+1) %> // in state <%= s[:id] %>
       <% end %>
